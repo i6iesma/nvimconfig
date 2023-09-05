@@ -31,7 +31,7 @@ return packer.startup(function(use)
 	use("wbthomason/packer.nvim")
 	use("christoomey/vim-tmux-navigator") -- tmux & split window navigation
 	use("bluz71/vim-nightfly-guicolors") -- preferred colorscheme
-	use("Mofiqul/dracula.nvim")
+	use("Mofiqul/dracula.nvim") -- Dracula colorscheme
 	use("szw/vim-maximizer") -- maximizes and restores current window
 	--many lua functions plugins use
 	use("nvim-lua/plenary.nvim")
@@ -58,26 +58,59 @@ return packer.startup(function(use)
 	use("hrsh7th/cmp-buffer") -- source for text in buffer
 	use("hrsh7th/cmp-path") -- source for file system paths
 
+	-- Color picking for css
+	use({
+		"ziontee113/color-picker.nvim",
+		config = function()
+			require("color-picker")
+		end,
+	})
+	--Color viewing
+	use("norcalli/nvim-colorizer.lua")
 	-- snippets
 	use("L3MON4D3/LuaSnip") -- snippet engine
 	use("saadparwaiz1/cmp_luasnip") -- for autocompletion
 	use("rafamadriz/friendly-snippets") -- useful snippets
 
 	-- managing & installing lsp servers, linters & formatters
-	use("williamboman/mason.nvim") -- in charge of managing lsp servers, linters & formatters
-	use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
-
-	-- configuring lsp servers
-	use("neovim/nvim-lspconfig") -- easily configure language servers
-	use("hrsh7th/cmp-nvim-lsp") -- for autocompletion
-	use({ "glepnir/lspsaga.nvim", branch = "main" }) -- enhanced lsp uis
-	use("onsails/lspkind.nvim") -- vs-code like icons for autocompletion
-
-	--formatting and linting
-	use("jose-elias-alvarez/null-ls.nvim")
-	use("jayp0521/mason-null-ls.nvim")
-
+	-- use("williamboman/mason.nvim") -- in charge of managing lsp servers, linters & formatters
+	-- use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
+	--
+	-- -- configuring lsp servers
+	-- use("neovim/nvim-lspconfig") -- easily configure language servers
+	-- use("hrsh7th/cmp-nvim-lsp") -- for autocompletion
+	-- use({ "glepnir/lspsaga.nvim", branch = "main" }) -- enhanced lsp uis
+	-- use("onsails/lspkind.nvim") -- vs-code like icons for autocompletion
+	--
+	-- --formatting and linting
+	-- use("jose-elias-alvarez/null-ls.nvim")
+	-- use("jayp0521/mason-null-ls.nvim")
+	--
 	-- treesitter configuration
+    --
+    --
+    -- LSP ZERO
+    use {
+        "williamboman/mason.nvim"
+    }
+	use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
+    use {
+        'VonHeikemen/lsp-zero.nvim',
+        branch = 'v2.x',
+        requires = {
+            -- LSP Support
+            {'neovim/nvim-lspconfig'},             -- Required
+            {'williamboman/mason.nvim'},           -- Optional
+            {'williamboman/mason-lspconfig.nvim'}, -- Optional
+
+            -- Autocompletion
+            {'hrsh7th/nvim-cmp'},     -- Required
+            {'hrsh7th/cmp-nvim-lsp'}, -- Required
+            {'L3MON4D3/LuaSnip'},     -- Required
+        }
+    }
+
+
 	use({
 		"nvim-treesitter/nvim-treesitter",
 		run = function()

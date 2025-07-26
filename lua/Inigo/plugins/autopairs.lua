@@ -19,6 +19,7 @@ if not cmp_autopairs_setup then
 	return
 end
 
+
 -- import nvim-cmp plugin safely (completions plugin)
 local cmp_setup, cmp = pcall(require, "cmp")
 if not cmp_setup then

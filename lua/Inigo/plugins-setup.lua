@@ -1,132 +1,57 @@
--- aut instalpacker if not installed
---
-local ensure_packer = function()
-	local fn = vim.fn
-	local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-	if fn.empty(fn.glob(install_path)) > 0 then
-		fn.system({ "git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path })
-		vim.cmd([[packadd packer.nvim]])
-		return true
-	end
-	return false
-end
-local packer_bootstrap = ensure_packer() -- true if packer was just installed
+-- ~/.config/nvim/lua/Inigo/plugins-setup.lua
 
--- autocommand that reloads neovim and installs/updates/removes plugins
--- when file is saved
-vim.cmd([[ 
-  augroup packer_user_config
-    autocmd!
-    autocmd BufWritePost plugins-setup.lua source <afile> | PackerSync
-  augroup end
-]])
--- import packer safely
 local status, packer = pcall(require, "packer")
 if not status then
-	return
+    return
 end
--- add list of plugins to install
+
 return packer.startup(function(use)
-	-- packer can manage itself
-	use("wbthomason/packer.nvim")
-	use("christoomey/vim-tmux-navigator") -- tmux & split window navigation
-	use("bluz71/vim-nightfly-guicolors") -- preferred colorscheme
-	use("Mofiqul/dracula.nvim") -- Dracula colorscheme
-	use("szw/vim-maximizer") -- maximizes and restores current window
-	--many lua functions plugins use
-	use("nvim-lua/plenary.nvim")
-	-- commenting with gc
-	-- essential plugins
-	use("vim-scripts/ReplaceWithRegister") -- replace with register contents using motion (gr + motion)
-	use("tpope/vim-surround") -- add, delete, change surroundings (it's awesome)
-	use("numToStr/Comment.nvim")
-	-- file explorer
-	use("nvim-tree/nvim-tree.lua")
+    use("wbthomason/packer.nvim")
 
-	-- vs-code like icons
-	use("kyazdani42/nvim-web-devicons")
+    -- Existing plugins
+    use("christoomey/vim-tmux-navigator")
+    use("bluz71/vim-nightfly-guicolors")
+    use("Mofiqul/dracula.nvim")
+    use("szw/vim-maximizer")
+    use("nvim-lua/plenary.nvim")
+    use("vim-scripts/ReplaceWithRegister")
+    use("tpope/vim-surround")
 
-	-- statusline
-	use("nvim-lualine/lualine.nvim")
+    -- LSP plugins (keep Mason and lspconfig if you want)
+    use("williamboman/mason.nvim")
+    use("williamboman/mason-lspconfig.nvim")
+    use("neovim/nvim-lspconfig")
 
-	-- fuzzy finding w/ telescope
-	use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" }) -- dependency for better sorting performance
-	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x" }) -- fuzzy finder
+    -- Replace all nvim-cmp stuff with coc.nvim
+    use({ "neoclide/coc.nvim", branch = "release" })
 
-	-- autocompletion
-	use("hrsh7th/nvim-cmp") -- completion plugin
-	use("hrsh7th/cmp-buffer") -- source for text in buffer
-	use("hrsh7th/cmp-path") -- source for file system paths
+    -- Other plugins
+    use("glepnir/lspsaga.nvim")
+    use("onsails/lspkind.nvim")
+    -- Replaced null-ls.nvim with its community successor none-ls.nvim
+    use("nvimtools/none-ls.nvim")
+    -- Removed mason-null-ls.nvim as it's specific to null-ls
+    -- use("jayp0521/mason-null-ls.nvim")
 
-	-- Color picking for css
-	use({
-		"ziontee113/color-picker.nvim",
-		config = function()
-			require("color-picker")
-		end,
-	})
-	--Color viewing
-	use("norcalli/nvim-colorizer.lua")
-	-- snippets
-	use("L3MON4D3/LuaSnip") -- snippet engine
-	use("saadparwaiz1/cmp_luasnip") -- for autocompletion
-	use("rafamadriz/friendly-snippets") -- useful snippets
+    use("numToStr/Comment.nvim")
+    use("nvim-tree/nvim-tree.lua")
+    use("kyazdani42/nvim-web-devicons")
+    use("nvim-lualine/lualine.nvim")
+    use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" })
+    use({ "nvim-telescope/telescope.nvim", branch = "0.1.x" })
+    use({ "ziontee113/color-picker.nvim" })
+    use("norcalli/nvim-colorizer.lua")
+    use({
+        "nvim-treesitter/nvim-treesitter",
+        run = function()
+            local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
+            ts_update()
+        end,
+    })
+    use("windwp/nvim-autopairs")
+    use({ "windwp/nvim-ts-autotag", after = "nvim-treesitter" })
+    use("lewis6991/gitsigns.nvim")
 
-	-- managing & installing lsp servers, linters & formatters
-	-- use("williamboman/mason.nvim") -- in charge of managing lsp servers, linters & formatters
-	-- use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
-	--
-	-- -- configuring lsp servers
-	-- use("neovim/nvim-lspconfig") -- easily configure language servers
-	-- use("hrsh7th/cmp-nvim-lsp") -- for autocompletion
-	-- use({ "glepnir/lspsaga.nvim", branch = "main" }) -- enhanced lsp uis
-	-- use("onsails/lspkind.nvim") -- vs-code like icons for autocompletion
-	--
-	-- --formatting and linting
-	-- use("jose-elias-alvarez/null-ls.nvim")
-	-- use("jayp0521/mason-null-ls.nvim")
-	--
-	-- treesitter configuration
-    --
-    --
-    -- LSP ZERO
-    use {
-        "williamboman/mason.nvim"
-    }
-	use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
-    use {
-        'VonHeikemen/lsp-zero.nvim',
-        branch = 'v2.x',
-        requires = {
-            -- LSP Support
-            {'neovim/nvim-lspconfig'},             -- Required
-            {'williamboman/mason.nvim'},           -- Optional
-            {'williamboman/mason-lspconfig.nvim'}, -- Optional
-
-            -- Autocompletion
-            {'hrsh7th/nvim-cmp'},     -- Required
-            {'hrsh7th/cmp-nvim-lsp'}, -- Required
-            {'L3MON4D3/LuaSnip'},     -- Required
-        }
-    }
-
-
-	use({
-		"nvim-treesitter/nvim-treesitter",
-		run = function()
-			local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
-			ts_update()
-		end,
-	})
-
-	-- auto closing
-	use("windwp/nvim-autopairs") -- autoclose parens, brackets, quotes, etc...
-	use({ "windwp/nvim-ts-autotag", after = "nvim-treesitter" }) -- autoclose tags
-
-	-- git integration
-	use("lewis6991/gitsigns.nvim") -- show line modifications on left hand side
-
-	if packer_bootstrap then
-		require("packer").sync()
-	end
+    -- packer_bootstrap is handled in init.lua
 end)
+

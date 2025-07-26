@@ -46,3 +46,30 @@ keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<cr>") -- list available 
 
 --Color picker
 keymap.set("n", "<leader>co", "<cmd>PickColor<cr>")
+
+
+local status, treesitter = pcall(require, "nvim-treesitter.configs")
+if not status then
+	return
+end
+
+
+vim.api.nvim_set_keymap('i', '<Tab>', [[
+  coc#pum#visible() ? coc#pum#next(1) : CheckBackspace() ? "\<Tab>" : coc#refresh()
+]], { expr = true, silent = true })
+
+
+vim.keymap.set('i', '<CR>', function()
+  if vim.fn['coc#pum#visible']() == 1 then
+    return vim.fn['coc#pum#confirm']()
+  else
+    -- Changed the string literal from double quotes to Lua long string [[...]]
+    -- This prevents Lua from trying to interpret Vimscript escape sequences like \<C-g> and \<CR>
+    return [[\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>]]
+  end
+end, {
+  expr = true,
+  silent = true
+})
+
+
